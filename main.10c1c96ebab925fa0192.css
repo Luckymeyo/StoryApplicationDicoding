@@ -664,12 +664,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	border-radius: 5px;
 	}
 .leaflet-control-layers-toggle {
-	background-image: url(/StoryApplicationDicoding/images/layers.png);
+	background-image: url(./StoryApplicationDicoding/images/layers.png);
 	width: 36px;
 	height: 36px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
-	background-image: url(/StoryApplicationDicoding/images/layers-2x.png);
+	background-image: url(./StoryApplicationDicoding/images/layers-2x.png);
 	background-size: 26px 26px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
@@ -712,7 +712,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 /* Default icon URLs */
 .leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
-	background-image: url(/StoryApplicationDicoding/images/marker-icon.png);
+	background-image: url(./StoryApplicationDicoding/images/marker-icon.png);
 	}
 
 
@@ -969,4 +969,4 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	}
 
 
-/*# sourceMappingURL=main.3002725d28a7b66cd1e5.css.map*/
+/*# sourceMappingURL=main.10c1c96ebab925fa0192.css.map*/
