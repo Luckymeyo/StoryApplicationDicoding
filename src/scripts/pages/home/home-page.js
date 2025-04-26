@@ -1,7 +1,9 @@
+// src/scripts/pages/home/home-page.js
+
 import {
   saveStoriesToIDB,
   getStoriesFromIDB,
-} from '../db.js';
+} from '../../db.js';
 
 function renderStoryList(stories) {
   if (!stories || stories.length === 0) {
@@ -35,28 +37,29 @@ export default class HomePage {
   }
 
   async afterRender() {
-    console.log('🏁 HomePage.afterRender triggered');
     const container = document.getElementById('stories');
     let stories = [];
+    const token = localStorage.getItem('token');
 
     try {
-      const token = localStorage.getItem('token');
+      // include the Bearer token so the API will actually return a 200
       const res = await fetch('https://story-api.dicoding.dev/v1/stories', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      // if the token is invalid or missing, it'll still 401
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+
       const { list } = await res.json();
-      console.log('📥 Stories fetched from API:', list);
       stories = list;
 
+      // save into IndexedDB for offline fallback
       await saveStoriesToIDB(stories);
-      console.log('💾 Stories saved to IndexedDB');
     } catch (err) {
       console.warn('⚠️ Fetch gagal, ambil cerita dari IndexedDB:', err);
       stories = await getStoriesFromIDB();
-      console.log('📤 Stories loaded from IndexedDB:', stories);
     }
 
     container.innerHTML = renderStoryList(stories);
