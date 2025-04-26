@@ -1,3 +1,4 @@
+import initPushNotification from '../push-notification-init.js';
 
 export function renderLogin(container) {
   const html = `
@@ -34,6 +35,7 @@ export function renderLogin(container) {
       if (data.error) throw new Error(data.message);
 
       localStorage.setItem('token', data.loginResult.token);
+      await initPushNotification(); // Run after token is stored
       location.hash = '#/home';
     } catch (err) {
       alert('Login gagal: ' + err.message);

@@ -33,4 +33,16 @@ async function initPushNotification() {
   }
 }
 
+async function sendSubscriptionToServer(subscription, token) {
+  await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(subscription)
+  });
+}
+
+
 export default initPushNotification;

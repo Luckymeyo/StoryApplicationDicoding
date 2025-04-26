@@ -24,7 +24,15 @@ export async function saveStoriesToIDB(stories) {
   const db = await openDB();
   const tx = db.transaction(STORE_STORIES, 'readwrite');
   const store = tx.objectStore(STORE_STORIES);
-  stories.forEach(s => store.put(s));
+
+  stories.forEach(s => {
+    if (s.id) {
+      store.put(s);
+    } else {
+      console.warn('Story without id skipped:', s);
+    }
+  });
+
   return tx.complete;
 }
 

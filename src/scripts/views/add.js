@@ -1,8 +1,11 @@
+// src/scripts/pages/add.js
+
 import { postStory } from '../presenters/addPresenter';
+import { saveOutboxItem } from '../db.js';
 import 'leaflet/dist/leaflet.css';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 
-export function renderAdd(container) {
+export async function renderAdd(container) {
   const token = localStorage.getItem('token');
   if (!token) {
     location.hash = '#/login';
@@ -17,9 +20,9 @@ export function renderAdd(container) {
       <h2>Tambah Cerita</h2>
       <form id="storyForm">
         <label for="description">Deskripsi</label>
-        <input type="text" id="description" required>
+        <input type="text" id="description" required />
 
-        <label for="photo">Foto</label>
+        <label for="photoMethod">Foto</label>
         <select id="photoMethod">
           <option value="file">Upload File</option>
           <option value="camera">Gunakan Kamera</option>
@@ -31,13 +34,13 @@ export function renderAdd(container) {
           <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
         </div>
 
-        <input type="file" id="altPhoto" accept="image/*">
+        <input type="file" id="altPhoto" accept="image/*" />
 
         <label for="lat">Latitude</label>
-        <input type="text" id="lat">
+        <input type="text" id="lat" />
 
         <label for="lon">Longitude</label>
-        <input type="text" id="lon">
+        <input type="text" id="lon" />
 
         <div id="mapForm" class="map-fullwidth" style="margin-bottom: 1rem;"></div>
 
@@ -46,30 +49,33 @@ export function renderAdd(container) {
     </section>
   `;
 
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const captureBtn = document.getElementById('capture');
-  const altFile = document.getElementById('altPhoto');
-  const photoMethod = document.getElementById('photoMethod');
-  const cameraSection = document.getElementById('cameraSection');
-  const context = canvas.getContext('2d');
-  const form = document.getElementById('storyForm');
+  const video        = document.getElementById('video');
+  const canvas       = document.getElementById('canvas');
+  const captureBtn   = document.getElementById('capture');
+  const altFile      = document.getElementById('altPhoto');
+  const photoMethod  = document.getElementById('photoMethod');
+  const cameraSection= document.getElementById('cameraSection');
+  const context      = canvas.getContext('2d');
+  const form         = document.getElementById('storyForm');
 
+  // Toggle camera vs file input
   photoMethod.addEventListener('change', () => {
     const useCam = photoMethod.value === 'camera';
     cameraSection.style.display = useCam ? 'block' : 'none';
-    altFile.style.display = useCam ? 'none' : 'block';
+    altFile.style.display      = useCam ? 'none' : 'block';
 
     if (useCam) {
-      navigator.mediaDevices.getUserMedia({ video: true }).then(camStream => {
-        stream = camStream;
-        video.srcObject = stream;
-      });
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(camStream => {
+          stream = camStream;
+          video.srcObject = stream;
+        });
     } else {
       if (stream) stream.getTracks().forEach(t => t.stop());
     }
   });
 
+  // Capture photo from video
   captureBtn.addEventListener('click', () => {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob(blob => {
@@ -78,12 +84,13 @@ export function renderAdd(container) {
     }, 'image/jpeg');
   });
 
+  // Handle form submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const desc = form.description.value;
-    const lat = form.lat.value;
-    const lon = form.lon.value;
+    const desc = form.description.value.trim();
+    const lat  = form.lat.value.trim();
+    const lon  = form.lon.value.trim();
 
     const formData = new FormData();
     formData.append('description', desc);
@@ -106,18 +113,37 @@ export function renderAdd(container) {
     if (lon) formData.append('lon', lon);
 
     try {
+      // 1) Coba kirim langsung ke API
       await postStory(token, formData);
-      alert('Cerita berhasil ditambahkan.');
+      alert('Cerita berhasil ditambahkan (online).');
       location.hash = '#/';
     } catch (err) {
-      alert('Gagal mengirim cerita: ' + err.message);
+      // 2) Jika gagal (misal offline), simpan ke outbox IndexedDB
+      console.warn('Offline: simpan cerita ke outbox…');
+      await saveOutboxItem({ token, formData });
+
+      // 3) Daftarkan background sync (jika didukung)
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        const reg = await navigator.serviceWorker.ready;
+        try {
+          await reg.sync.register('outbox-sync');
+          console.log('Background sync terdaftar: outbox-sync');
+        } catch (syncErr) {
+          console.error('Gagal register sync:', syncErr);
+        }
+      }
+
+      alert('Offline. Cerita akan dikirim saat online kembali.');
+      location.hash = '#/';
     }
   });
 
+  // Stop camera when navigating away
   window.addEventListener('hashchange', () => {
     if (stream) stream.getTracks().forEach(t => t.stop());
   }, { once: true });
 
+  // Initialize Leaflet map
   import('leaflet').then(L => {
     const map = L.map('mapForm').setView([-6.2, 106.8], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -137,15 +163,15 @@ export function renderAdd(container) {
 
     marker.on('dragend', () => {
       const pos = marker.getLatLng();
-      document.getElementById('lat').value = pos.lat;
-      document.getElementById('lon').value = pos.lng;
+      form.lat.value = pos.lat;
+      form.lon.value = pos.lng;
     });
 
     map.on('click', (e) => {
       const { lat, lng } = e.latlng;
       marker.setLatLng([lat, lng]);
-      document.getElementById('lat').value = lat;
-      document.getElementById('lon').value = lng;
+      form.lat.value = lat;
+      form.lon.value = lng;
     });
   });
 }
