@@ -3,8 +3,9 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin   = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin      = require('html-webpack-plugin');
+const CopyWebpackPlugin      = require('copy-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -48,6 +49,17 @@ module.exports = merge(common, {
       template: path.resolve(__dirname, 'src/index.html'),
       filename: 'index.html',
     }),
+
+    // Copy PWA assets into dist/
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, 'src/scripts/service-worker.js'), to: 'service-worker.js' },
+        { from: path.resolve(__dirname, 'src/public/offline.html'), to: 'offline.html' },
+        { from: path.resolve(__dirname, 'src/public/manifest.json'), to: 'manifest.json' },
+        { from: path.resolve(__dirname, 'src/public/favicon.png'), to: 'favicon.png' },
+        { from: path.resolve(__dirname, 'src/public/images'), to: 'images' },
+      ],
+    }),    
   ],
 
   optimization: {

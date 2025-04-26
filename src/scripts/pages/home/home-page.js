@@ -36,12 +36,17 @@ export default class HomePage {
 
   async afterRender() {
     console.log('🏁 HomePage.afterRender triggered');
-    console.log('🗃️ IndexedDB opened');   // this will fire once openDB() is called internally
     const container = document.getElementById('stories');
     let stories = [];
 
     try {
-      const res = await fetch('https://story-api.dicoding.dev/v1/stories');
+      const token = localStorage.getItem('token');
+      const res = await fetch('https://story-api.dicoding.dev/v1/stories', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       const { list } = await res.json();
       console.log('📥 Stories fetched from API:', list);
       stories = list;
