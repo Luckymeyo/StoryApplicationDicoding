@@ -14,7 +14,7 @@
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('./service-worker.js')
+      .register('/StoryApplicationDicoding/service-worker.js')
         .then(() => console.log('✅ SW registered'))
         .catch(err => console.error('❌ SW failed:', err));
     }</script></body></html>
