@@ -1,20 +1,19 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="shortcut icon" href="favicon.png"/><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" crossorigin="anonymous"/><link rel="manifest" href="manifest.json"/><title>App</title><script defer="defer" src="/StoryApplicationDicoding/runtime.e80072061d9b4fcffc0b.bundle.js"></script><script defer="defer" src="/StoryApplicationDicoding/438.b68bcade2cc8a234d2a9.bundle.js"></script><script defer="defer" src="/StoryApplicationDicoding/main.15306b11331a57c660b7.bundle.js"></script><link href="/StoryApplicationDicoding/main.3002725d28a7b66cd1e5.css" rel="stylesheet"></head><body><a href="#/" class="skip-link">Skip to content</a><header style="view-transition-name: header;"><div class="main-header container"><a class="brand-name" href="#/">App</a><nav id="navigation-drawer" class="navigation-drawer"><ul id="nav-list" class="nav-list"><li><a href="#/"><i class="fas fa-home"></i> Beranda</a></li><li><a href="#/add"><i class="fas fa-plus-circle"></i> Tambah Cerita</a></li><li><a href="#/about"><i class="fas fa-info-circle"></i> About</a></li></ul></nav><button id="drawer-button" class="drawer-button">☰</button></div></header><main id="app" class="view-wrapper" tabindex="-1"></main><script>document.getElementById('drawer-button').addEventListener('click', () => {
-      document.getElementById('navigation-drawer').classList.toggle('open');
-    });
-
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="shortcut icon" href="favicon.png"/><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" crossorigin="anonymous"/><link rel="manifest" href="manifest.json"/><title>App</title><script defer="defer" src="/StoryApplicationDicoding/runtime.e80072061d9b4fcffc0b.bundle.js"></script><script defer="defer" src="/StoryApplicationDicoding/438.b68bcade2cc8a234d2a9.bundle.js"></script><script defer="defer" src="/StoryApplicationDicoding/main.265611ac79e474a8b8a6.bundle.js"></script><link href="/StoryApplicationDicoding/main.6d3c973d2bdeedfc61a4.css" rel="stylesheet"></head><body><a href="#app" class="skip-link">Skip to content</a><header style="view-transition-name: header;"><div class="main-header container"><a class="brand-name" href="#/">App</a><nav id="navigation-drawer" class="navigation-drawer"><ul id="nav-list" class="nav-list"><li><a href="#/"><i class="fas fa-home"></i> Beranda</a></li><li><a href="#/add"><i class="fas fa-plus-circle"></i> Tambah Cerita</a></li><li><a href="#/offline"><i class="fas fa-database"></i> Cerita Offline</a></li><li><a href="#/about"><i class="fas fa-info-circle"></i> About</a></li><li id="push-subscribe-li" style="display: none;"><button id="push-subscribe-button" class="nav-button"><i class="fas fa-bell"></i> Subscribe</button></li><li id="push-unsubscribe-li" style="display: none;"><button id="push-unsubscribe-button" class="nav-button"><i class="fas fa-bell-slash"></i> Unsubscribe</button></li></ul></nav><button id="drawer-button" class="drawer-button">☰</button></div></header><main id="app" class="view-wrapper" tabindex="-1"></main><script>// Keep skip link listener
     const skipLink = document.querySelector('.skip-link');
-    skipLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      const main = document.getElementById('app');
-      if (main) {
-        main.setAttribute('tabindex', '-1');
-        main.focus();
-      }
-    });
-
+    if (skipLink) {
+        skipLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          const main = document.getElementById('app');
+          if (main) {
+            main.setAttribute('tabindex', '-1');
+            main.focus();
+          }
+        });
+    }
     if ('serviceWorker' in navigator) {
+      const swPath = '/StoryApplicationDicoding/service-worker.js';
       navigator.serviceWorker
-      .register('/StoryApplicationDicoding/service-worker.js')
-        .then(() => console.log('✅ SW registered'))
-        .catch(err => console.error('❌ SW failed:', err));
+      .register(swPath, { scope: '/StoryApplicationDicoding/' })
+        .then((registration) => console.log('✅ SW registered attempt with scope:', registration.scope))
+        .catch(err => console.error('❌ SW registration failed (EXPECTED in dev mode):', err));
     }</script></body></html>
