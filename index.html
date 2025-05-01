@@ -4,10 +4,4 @@
       .register(swPath, { scope: '/StoryApplicationDicoding/' }) // Production scope
         .then((registration) => console.log('✅ SW registered attempt with scope:', registration.scope))
         .catch(err => console.error('❌ SW registration failed:', err));
-    }
-
-    document.getElementById('drawer-button')
-      .addEventListener('click', () => {
-        document.getElementById('navigation-drawer')
-                .classList.toggle('open');
-      });</script></body></html>
+    }</script></body></html>
